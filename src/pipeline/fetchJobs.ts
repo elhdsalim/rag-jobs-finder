@@ -38,36 +38,37 @@ function extractMinimalJobsData(tasks: Task[]): MinimalJobData[] {
     return jobs;
 }
 
-function findEnrichedJob(jobId: string, tasks: Task[]) {
+function buildJobIndex(tasks: Task[]): Map<string, any> {
+    const map = new Map<string, any>();
+
     for (const task of tasks) {
-        if (!task.result || task.result.length === 0) continue;
+        if (!task.result?.length) continue;
 
         for (const item of task.result[0].items) {
-            if (item.job_id === jobId) {
-                return item;
+            if (item.job_id) {
+                map.set(item.job_id, item);
             }
         }
     }
 
-    return null;
+    return map;
 }
 
-export function enrichJobs(minimalJobs: MinimalJobData[], tasks: Task[]): EnrichedJobData[] {
-    const enrichedJobs: EnrichedJobData[] = [];
 
-    for (const job of minimalJobs) {
-        const enrichedJob = findEnrichedJob(job.job_id, tasks);
+export function enrichJobs( minimalJobs: MinimalJobData[], tasks: Task[]): EnrichedJobData[] {
+    const index = buildJobIndex(tasks);
 
-        enrichedJobs.push({
+    return minimalJobs.map(job => {
+        const enriched = index.get(job.job_id);
+
+        return {
             ...job,
-            employer_name: enrichedJob?.employer_name,
-            source_name: enrichedJob?.source_name,
-            contract_type: enrichedJob?.contract_type,
-            salary: enrichedJob?.salary ?? null,
-            timestamp: enrichedJob?.timestamp ?? null,
-            employer_url: enrichedJob?.employer_url ?? null,
-        });
-    }
-
-    return enrichedJobs;
+            employer_name: enriched?.employer_name,
+            source_name: enriched?.source_name,
+            contract_type: enriched?.contract_type,
+            salary: enriched?.salary ?? null,
+            timestamp: enriched?.timestamp ? new Date(enriched.timestamp).toISOString() : null,
+            employer_url: enriched?.employer_url ?? null,
+        };
+    });
 }
