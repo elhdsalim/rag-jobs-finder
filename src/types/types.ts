@@ -38,7 +38,6 @@ export type Job = {
     title: string;
     location: string;
     source_url: string;
-
     employer_name?: string;
     source_name?: string;
     contract_type?: string;
