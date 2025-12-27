@@ -11,17 +11,38 @@ export type Task = {
 };
 
 export type MinimalJobData = {
-    job_id : string;
+    job_id: string;
     title: string;
     location: string;
     source_url: string;
 };
 
 export type EnrichedJobData = MinimalJobData & {
-  employer_name?: string;
-  source_name?: string;
-  contract_type?: string;
-  salary?: string | null;
-  timestamp?: string | null;
-  employer_url : string | null;
+    employer_name?: string;
+    source_name?: string;
+    contract_type?: string;
+    salary?: string | null;
+    timestamp?: string | null;
+    employer_url: string | null;
+};
+
+export type ClassifiedJob = {
+    role: string;
+    level: string;
+    stack: string[];
+    is_tech: boolean;
+};
+
+export type Job = {
+    job_id: string;
+    title: string;
+    location: string;
+    source_url: string;
+
+    employer_name?: string;
+    source_name?: string;
+    contract_type?: string;
+    salary?: string | null;
+    timestamp?: string | null;
+    employer_url: string | null;
 };
