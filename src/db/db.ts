@@ -38,6 +38,12 @@ export async function initDb(): Promise<Database> {
     );
   `);
 
+  try {
+    await db.exec(`ALTER TABLE jobs ADD COLUMN embedding TEXT`);
+  } catch {
+    // column already exists → ignore
+  }
+
   return db;
 }
 
@@ -61,9 +67,10 @@ export async function saveJobs(db: Database, jobs: EnrichedJobData[]) {
         stack,
         is_tech,
         classified_at,
+        embedding,
         created_at,
         updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) -- index of each attributes
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) -- index of each attributes
       ON CONFLICT(job_id) DO UPDATE SET
         title = excluded.title,
         location = excluded.location,
@@ -95,6 +102,7 @@ export async function saveJobs(db: Database, jobs: EnrichedJobData[]) {
       null, // stack
       null, // is_tech
       null, // classified_at
+      null, // embedding (NULL at first)
 
       now,
       now
